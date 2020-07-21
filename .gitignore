@@ -1,0 +1,29 @@
+HELP.md
+target/
+/target/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+/build/
+
+### VS Code ###
+.vscode/
+
+.mvn/**
+/mvnw.cmd
+/mvnw
+/HELP.md
+/hippflow.iml
+/.mvn/
+/.mvn/wrapper/
+.mvn/*
