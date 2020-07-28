@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 import static java.util.Map.Entry;
-import static java.util.Map.of;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 
@@ -43,6 +42,15 @@ public class Biller {
                     .trips(new ArrayList<>())
                     .build();
 
+            if(list.size()%2 != 0) {
+                Optional<Tap> optionalLatestTap = getLatestTapFrom(list);
+                if(optionalLatestTap.isPresent()) {
+                    Tap latestTap = optionalLatestTap.get();
+                    List<Integer> zonesOfLatestTap = latestTap.getStation().getZones();
+                     list.remove(latestTap);
+                }
+            }
+
             for (int i = 0; i < list.size() - 1; i += 2) {
 
                 int bestZoneFrom = list.get(i).getStation().getBestZone();
@@ -70,17 +78,30 @@ public class Biller {
                 }));
 
                 int totalCostInCents = customerSummary.getTotalCostInCents() + trip.getCostInCents();
-                customerSummary.setTotalCostInCents(totalCostInCents);
+
+                customerSummary.setTotalCostInCents(Math.min(totalCostInCents, 1000));
+
                 customerSummary.getTrips().add(trip);
                 log.info("new Trip was added : {}", trip);
                 log.info("for the customer : {}", id);
             }
+
+            boolean isZoneOneTwo = customerSummary.getTrips().stream().allMatch(t -> List.of(1,2).containsAll(List.of(t.getZoneFrom(),t.getZoneTo())));
+
+            if (customerSummary.getTotalCostInCents() > 800 && isZoneOneTwo) {
+                customerSummary.setTotalCostInCents(800);
+            }
+
             customerSummaries.add(customerSummary);
         });
         return Summary.newSummary()
                 .customerSummaries(customerSummaries)
                 .build();
 
+    }
+
+    private Optional<Tap> getLatestTapFrom(List<Tap> list) {
+        return list.isEmpty() ? Optional.empty() : Optional.of(list.get(list.size() -1));
     }
 
     /**
@@ -92,7 +113,7 @@ public class Biller {
      */
    public int cheapestPrice(int from, int to) {
 
-        Map<Integer, List<Integer>> prices = of(
+        Map<Integer, List<Integer>> prices = Map.of(
                 240, List.of(1,2),
                 200, List.of(3,4),
                 280, List.of(1,2,3),
@@ -100,7 +121,9 @@ public class Biller {
 
         );
         Optional<Entry<Integer, List<Integer>>> optionalBestPrice = prices.entrySet()
-                .stream().filter(map -> map.getValue().containsAll(List.of(from, to))).min(Comparator.comparingInt(Entry::getKey));
+                .stream().filter(map -> map.getValue().containsAll(List.of(from, to)))
+                .min(Comparator.comparingInt(Entry::getKey));
+
        if (optionalBestPrice.isPresent()) {
            return   optionalBestPrice.get().getKey();
         } else {

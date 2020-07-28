@@ -46,6 +46,18 @@ class BillerTest {
         Summary summary = biller.bill(journey);
         assertEquals(expected,summary);
     }
+
+    @Test
+    void should_bill_8_euros_when_traveling_within_zone_1_an_2() {
+        Biller biller = new Biller();
+        Journey journey = get_3_times_A_D_D_A_Journey();
+        Summary summary = biller.bill(journey);
+        CustomerSummary customerSummary_1 = summary.getCustomerSummaries()
+                .stream().filter(customerSummary -> customerSummary.getCustomerId() == 1).findFirst().get();
+        assertEquals(800,customerSummary_1.getTotalCostInCents());
+    }
+
+
     @Test
     void should_bill_input_example_file_of_journey() throws IOException {
         Biller biller = new Biller();
@@ -124,5 +136,72 @@ class BillerTest {
                                     .build()
                     ))
                     .build();
+    }
+
+    private Journey get_3_times_A_D_D_A_Journey() {
+        return Journey.newJourney()
+                .taps(List.of(
+                        Tap.newTap()
+                                .unixTimestamp(1)
+                                .station(Station.A)
+                                .customerId(1)
+                                .build(),
+                        Tap.newTap()
+                                .unixTimestamp(2)
+                                .station(Station.D)
+                                .customerId(1)
+                                .build(),
+                        Tap.newTap()
+                                .unixTimestamp(3)
+                                .station(Station.D)
+                                .customerId(1)
+                                .build(),
+                        Tap.newTap()
+                                .unixTimestamp(4)
+                                .station(Station.A)
+                                .customerId(1)
+                                .build(),
+                        Tap.newTap()
+                                .unixTimestamp(5)
+                                .station(Station.A)
+                                .customerId(1)
+                                .build(),
+                        Tap.newTap()
+                                .unixTimestamp(6)
+                                .station(Station.D)
+                                .customerId(1)
+                                .build(),
+                        Tap.newTap()
+                                .unixTimestamp(7)
+                                .station(Station.D)
+                                .customerId(1)
+                                .build(),
+                        Tap.newTap()
+                                .unixTimestamp(8)
+                                .station(Station.A)
+                                .customerId(1)
+                                .build(),
+                        Tap.newTap()
+                                .unixTimestamp(9)
+                                .station(Station.A)
+                                .customerId(1)
+                                .build(),
+                        Tap.newTap()
+                                .unixTimestamp(10)
+                                .station(Station.D)
+                                .customerId(1)
+                                .build(),
+                        Tap.newTap()
+                                .unixTimestamp(11)
+                                .station(Station.D)
+                                .customerId(1)
+                                .build(),
+                        Tap.newTap()
+                                .unixTimestamp(12)
+                                .station(Station.A)
+                                .customerId(1)
+                                .build()
+                ))
+                .build();
     }
 }
