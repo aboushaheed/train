@@ -86,7 +86,7 @@ public class Biller {
                 log.info("for the customer : {}", id);
             }
 
-            boolean isZoneOneTwo = customerSummary.getTrips().stream().allMatch(t -> List.of(1,2).containsAll(List.of(t.getZoneFrom(),t.getZoneTo())));
+            boolean isZoneOneTwo = isWithinZoneXandY(customerSummary,1,2);
 
             if (customerSummary.getTotalCostInCents() > 800 && isZoneOneTwo) {
                 customerSummary.setTotalCostInCents(800);
@@ -98,6 +98,10 @@ public class Biller {
                 .customerSummaries(customerSummaries)
                 .build();
 
+    }
+
+    private boolean isWithinZoneXandY(CustomerSummary customerSummary, Integer zoneX, Integer zoneY) {
+        return customerSummary.getTrips().stream().allMatch(t -> List.of(zoneX,zoneY).containsAll(List.of(t.getZoneFrom(),t.getZoneTo())));
     }
 
     private Optional<Tap> getLatestTapFrom(List<Tap> list) {
